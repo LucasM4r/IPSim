@@ -1,0 +1,129 @@
+.root {
+    -fx-background-color: #2b2b2b;
+}
+.menu-bar {
+    -fx-background-color: #363535;
+}
+
+.menu-bar .menu .label {
+    -fx-text-fill: #ffffff;
+}
+
+.menu-bar .menu .menu-item {
+    -fx-text-fill: #ffffff; /* Text color for submenus */
+}
+
+/* Background color for submenus */
+.context-menu {
+    -fx-background-color: #363535; /* Background color for the context menu */
+    -fx-border-color: transparent; /* Remove the border */
+}
+
+.context-menu .menu-item {
+    -fx-background-color: #363535; /* Background color for submenus */
+    -fx-border-color: transparent; /* Remove the border */
+}
+
+.context-menu .menu-item:hover {
+    -fx-background-color: #555555; /* Background color on hover */
+    -fx-border-color: transparent; /* Remove the border */
+}
+
+.button-bar {
+    -fx-background-color: #1a1a1a;
+    -fx-alignment: center-right;
+}
+.button-bar .button {
+    -fx-background-color: #1a1a1a; /* Cor de fundo preta */
+    -fx-text-fill: #ffffff; /* Cor do texto branca */
+    -fx-border-color: transparent #ffffff #ffffff #ffffff; /* Borda apenas nos lados esquerdo e direito */
+    -fx-border-width: 0 1px 1px 1px; /* Largura da borda apenas nos lados esquerdo e direito */
+    -fx-border-radius: 0; /* Remove bordas arredondadas */
+    -fx-background-radius: 0; /* Remove bordas arredondadas */
+}
+.button-bar .button:hover {
+    -fx-background-color: #2b2b2b; /* Cor de fundo escura */
+    -fx-cursor: hand;
+}
+/* Estilo para o TextArea */
+.text-editor {
+    -fx-font-family: Consolas;
+    -fx-font-size: 16px;
+    -fx-padding: 5px;
+    -fx-background-color: #2b2b2b;
+    -fx-control-inner-background: #2b2b2b; /* Fundo do TextArea */
+    -fx-text-fill: #ffffff; /* Cor do texto branco */
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+}
+.text-editor .scroll-pane {
+
+    -fx-hbar-policy: never;
+    -fx-vbar-policy: never;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-border-color: transparent; /* Remove borda do ScrollPane */
+    -fx-background-color: transparent; /* Remove fundo do ScrollPane */
+
+
+}
+
+/* Define o fundo do TextFlow onde os números das linhas aparecem */
+.line-number-flow {
+    -fx-background-color: #2b2b2b;
+    -fx-padding: 8.5px;
+    -fx-alignment: top-center;
+}
+/* Estilo para os números das linhas */
+.line-number {
+    -fx-font-family: Consolas;
+    -fx-font-size: 16px;
+    -fx-text-fill: #ffffff; /* Cor do texto branco */
+
+}
+
+.error-console {
+    -fx-font-family: Consolas;
+    -fx-font-size: 14px;
+    -fx-padding: 5px;
+    -fx-background-color: #1e1e1e;
+    -fx-control-inner-background: #1e1e1e; /* Fundo do TextArea */
+    -fx-text-fill: #ff0000; /* Cor do texto vermelho para erros */
+}
+#toggleButtonContainer {
+    -fx-background-color: #1a1a1a;
+    -fx-padding: 5px;
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: #ffffff; /* Borda branca */
+}
+#toggleButtonContainer .scroll-pane {
+
+    -fx-hbar-policy: never;
+    -fx-vbar-policy: never;
+}
+#toggleButtonContainer .toggle-button {
+    -fx-background-color: #1a1a1a; /* Cor de fundo preta */
+    -fx-text-fill: #ffffff; /* Cor do texto branco */
+    -fx-border-color: #ffffff #ffffff transparent #ffffff; /* Borda apenas nos lados esquerdo e direito */
+    -fx-border-width: 1px 1px 0 1px; /* Largura da borda apenas nos lados esquerdo e direito */
+    -fx-border-radius: 0; /* Remove bordas arredondadas */
+    -fx-background-radius: 0; /* Remove bordas arredondadas */
+}
+#toggleButtonContainer .toggle-button:hover {
+    -fx-background-color: #2b2b2b; /* Cor de fundo escura */
+    -fx-cursor: hand;
+}
+#toggleButtonContainer .toggle-button:selected {
+    -fx-background-color: #2b2b2b; /* Cor de fundo escura */
+}
+
+
+.split-pane {
+    -fx-background-color: #2b2b2b; /* Cor de fundo escura */
+}
+
+.split-pane .split-pane-divider {
+    -fx-background-color: #444444; /* Cor da divisão */
+    -fx-border-color: #666666; /* Borda da divisão */
+    -fx-border-width: 1px;
+}
