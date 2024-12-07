@@ -27,13 +27,6 @@ public class NeanderProcessor extends Processor {
         datapath = new NeanderDatapath();
     }
 
-    public void run() {
-        System.out.println("Running Neander Processor");
-    }
-    public void getOperation(String binaryInstruction) {
-        System.out.println("Operation: " + controlpath.returnOperation(binaryInstruction));
-    }
-
     @Override
     public String getName() {
         return "NeanderProcessor";
@@ -49,9 +42,6 @@ public class NeanderProcessor extends Processor {
         return result;
     }
 
-    public void readAssembly(File assemblyFile) {
-        System.out.println("Reading assembly instruction: " + assemblyFile);
-    }
     @Override
     public String compile(File file) throws IOException, LexicalException, SyntacticException, SemanticException, CodeGenerationException {
 
@@ -64,12 +54,10 @@ public class NeanderProcessor extends Processor {
         // Análise sintática
         SyntacticAnalyzer syntacticAnalyzer = new SyntacticAnalyzer();
         syntacticAnalyzer.analyze(tokens);
-        System.out.println("Syntactic analysis passed.");
 
         // Análise semântica
-        SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer();
+        SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer(syntacticAnalyzer.getSymbolTable());
         semanticAnalyzer.analyze(tokens);
-        System.out.println("Semantic analysis passed.");
 
         // Geração de código
         CodeGenerator codeGenerator = new CodeGenerator(semanticAnalyzer.getSymbolTable());

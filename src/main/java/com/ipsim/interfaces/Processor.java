@@ -11,7 +11,6 @@ public abstract class Processor {
     
     DataPath datapath = null;
     ControlPath controlpath = null;
-    public abstract void run();
     public abstract void getOperation();
     public abstract List<String> binaryParser(String binaryInstruction);
     public abstract String getName();

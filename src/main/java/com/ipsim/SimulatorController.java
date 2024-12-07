@@ -46,7 +46,6 @@ public class SimulatorController {
 
     @FXML
     public void showRegisters() {
-        System.out.println("Attempting to show registers");
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/ipsim/registers_page.fxml"));
             Parent root = loader.load();
@@ -64,7 +63,6 @@ public class SimulatorController {
             if (vbox != null) {
                 GridPane gridPane = (GridPane) vbox.lookup("#registersContainer");
                 if (gridPane != null) {
-                    System.out.println("GridPane 'registersContainer' found");
                     gridPane.getChildren().clear();
 
                     Label registerHeader = new Label("Register");
@@ -91,15 +89,14 @@ public class SimulatorController {
                         row++;
                     }
                 } else {
-                    System.out.println("GridPane 'registersContainer' not found");
+                    throw new NullPointerException("GridPane 'registersContainer' not found");
                 }
             } else {
-                System.out.println("VBox 'registersContainerVBox' not found");
+                throw new NullPointerException("VBox 'registersContainerVBox' not found");
             }
 
             stage.setScene(scene); // Define a nova cena
             stage.show();
-            System.out.println("Registers page shown");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -108,11 +105,8 @@ public class SimulatorController {
 
     @FXML
     public void saveRegisters() {
-        System.out.println("Saving register values");
-
         if (registerFields == null || registerFields.isEmpty()) {
-            System.out.println("registerFields is null or empty");
-            return;
+            throw new NullPointerException("Register fields not found");
         }
 
         HashMap<String, Register> registers = currentProcessor.getDatapath().getRegisters();
@@ -131,19 +125,15 @@ public class SimulatorController {
                     registerValue = Integer.parseInt(value);
                 }
                 registers.get(registerName).write(registerValue);
-                System.out.println("Register " + registerName + " saved with value " + registerValue);
             } catch (NumberFormatException e) {
-                System.out.println("Invalid value for register " + registerName);
+                throw new NumberFormatException("Invalid value for register");
             }
         }
-        System.out.println("Register values saved");
     }
     @FXML
     public void goBack() {
-        System.out.println("Going back to the previous page");
         if (stage == null) {
-            System.out.println("Stage is null. Cannot go back.");
-            return;
+            throw new NullPointerException("Stage is null");
         }
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/ipsim/simulator.fxml"));
@@ -153,7 +143,6 @@ public class SimulatorController {
 
             stage.setScene(scene); // Define a nova cena
             stage.show();
-            System.out.println("Previous page shown");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -161,7 +150,6 @@ public class SimulatorController {
 
     @FXML
     public void showMemories() {
-        System.out.println("Atempting to show memories");
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/ipsim/memories_page.fxml"));
             Parent root = loader.load();
@@ -173,7 +161,6 @@ public class SimulatorController {
             if(vbox != null) {
                 GridPane gridPane = (GridPane) vbox.lookup("#memoriesContainer");
                 if(gridPane != null) {
-                    System.out.println("GridPane 'memoriesContainer' found");
                     gridPane.getChildren().clear();
 
                     Label memoriesHeader = new Label("Memory");
@@ -203,13 +190,11 @@ public class SimulatorController {
             }
             stage.setScene(scene); // Define a nova cena
             stage.show();
-            System.out.println("Memories page shown");
         }catch(IOException e){
             e.printStackTrace();
         }
     }
     private void showMemory(String memoryName) {
-        System.out.println("Attempting to show memory " + memoryName);
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/ipsim/memory_page.fxml"));
             Parent root = loader.load();
@@ -222,7 +207,6 @@ public class SimulatorController {
             if (scrollPane != null) {
                 GridPane gridPane = (GridPane) scrollPane.getContent();
                 if (gridPane != null) {
-                    System.out.println("GridPane 'memoryContainer' found");
                     gridPane.getChildren().clear();
                     Label memoryHeader = new Label("Address");
                     memoryHeader.getStyleClass().add("address-label");
@@ -242,14 +226,13 @@ public class SimulatorController {
                         row++;
                     }
                 } else {
-                    System.out.println("GridPane 'memoryContainer' not found");
+                    throw new NullPointerException("GridPane 'memoryContainer' not found");
                 }
             } else {
-                System.out.println("ScrollPane 'memoryScrollPane' not found");
+                throw new NullPointerException("ScrollPane 'memoryScrollPane' not found");
             }
             stage.setScene(scene);
             stage.show();
-            System.out.println("Memory page shown");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -259,8 +242,7 @@ public class SimulatorController {
     private void saveMemory() {
         Memory memory = currentProcessor.getDatapath().getMemories().get("dataProgram");
         if (memory == null) {
-            System.out.println("Memory 'dataProgram' not found");
-            return;
+            throw new NullPointerException("Memory not found");
         }
         
         for (TextField valueField : memoryFields) {
@@ -278,11 +260,9 @@ public class SimulatorController {
                 int index = memoryFields.indexOf(valueField);
                 if (index >= 0 && index < memory.getSize()) { // Verifique se o índice está dentro do intervalo
                     memory.write(index, memoryValue);
-                } else {
-                    System.out.println("Index " + index + " is out of memory bounds");
                 }
             } catch (NumberFormatException e) {
-                System.out.println("Invalid value for memory address " + memoryFields.indexOf(valueField) + ": " + value);
+                throw new NumberFormatException("Invalid value for memory");
             }
         }
     }

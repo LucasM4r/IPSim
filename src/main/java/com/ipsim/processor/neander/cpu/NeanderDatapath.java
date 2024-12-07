@@ -18,7 +18,6 @@ public class NeanderDatapath extends DataPath {
     }
 
     public void execute(String operation, List<Object> arguments) {
-        System.out.println("Executing operation: " + operation + "," + arguments);
         if (!(arguments.get(0) instanceof Integer)) {
             throw new IllegalArgumentException(operation + " operation requires an integer argument");
         }

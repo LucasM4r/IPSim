@@ -105,23 +105,18 @@ public class EditorController {
 
 
     private void generateAsmButtons() {
-        System.out.println("Gerando botões para processadores...");
-        if (cpusArray.isEmpty()) {
-            System.out.println("cpusArray está vazio.");
-        }
+
         for (Processor processor : cpusArray) {
-            System.out.println("Criando botão para: " + processor.getName());
+
             ToggleButton button = new ToggleButton(processor.getName());
             toggleButtonContainer.getChildren().add(button);
             button.setToggleGroup(toggleGroup);
             if(currentProcessor == null && !cpusArray.isEmpty()) {
                 currentProcessor = cpusArray.get(0);
                 button.setSelected(true);
-                System.out.println("Nenhum processador selecionado. Selecionando o primeiro processador da lista: " + currentProcessor.getName());
             }
             button.setOnAction(e -> {
                 currentProcessor = processor;
-                System.out.println("Processador selecionado: " + processor.getName());
             });
         }
     }
@@ -167,14 +162,12 @@ public class EditorController {
         File binaryFile = fileChooser.showSaveDialog(new Stage());
         if (binaryFile != null) {
             Files.write(binaryFile.toPath(), binaryCode.getBytes());
-            System.out.println("Binary code saved to: " + binaryFile.getAbsolutePath());
         }
     }
 
     @FXML
     private void show() {
         // Lógica para executar o código
-        System.out.println("Executando o código...");
         try {
             createSecondStage();
             
@@ -186,7 +179,6 @@ public class EditorController {
     @FXML
     private void run() {
         // Lógica para executar o código
-        System.out.println("Executando o código...");
         try {
             currentProcessor.compile(currentFile);
             currentProcessor.executeProgram();

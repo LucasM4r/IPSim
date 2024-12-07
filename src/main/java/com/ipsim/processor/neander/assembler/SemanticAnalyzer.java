@@ -11,6 +11,9 @@ public class SemanticAnalyzer {
 
     private Map<String, Integer> symbolTable = new HashMap<>();
 
+    public SemanticAnalyzer(Map<String, Integer> symbolTable) {
+        this.symbolTable = symbolTable;
+    }
     public void analyze(List<LexicalAnalyzer.Token> tokens) throws SemanticException {
         int address = 0;
         Iterator<LexicalAnalyzer.Token> iterator = tokens.iterator();
@@ -18,16 +21,14 @@ public class SemanticAnalyzer {
         while (iterator.hasNext()) {
             LexicalAnalyzer.Token token = iterator.next();
             // Process the token here
-            System.out.println("Token: " + token.getType() + " Value: " + token.getValue()); // Debug
-
             switch (token.getType()) {
                 case LABEL:
                     String label = token.getValue().replace(":", ""); // Remove ':' from the label
-                    if (symbolTable.containsKey(label)) {
-                        throw new SemanticException("Label already defined: " + label);
-                    } 
-                    System.out.println("Label: " + label + " Address: " + address); // Debug
-                    symbolTable.put(label, address);
+                    
+                    if (!symbolTable.containsKey(label)) {
+                        throw new SemanticException("Label is not defined: " + label);
+                    }
+                    symbolTable.put(label, address);                    
                     break;
                 case INSTRUCTION:
                     address++;
