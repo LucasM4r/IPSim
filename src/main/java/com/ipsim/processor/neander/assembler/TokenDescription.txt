@@ -1,0 +1,8 @@
+MNEMONICS 
+    (NOP|STA|LDA|ADD|OR|AND|NOT|JMP|JN|JZ|HLT)
+LABEL
+    ([a-zA-Z_][a-zA-Z0-9_]*):
+ADDRESS_PATTERN
+    \\d+$
+COMMENT
+    ;(.+)$

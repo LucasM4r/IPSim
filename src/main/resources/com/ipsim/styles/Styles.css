@@ -127,3 +127,84 @@
     -fx-border-color: #666666; /* Borda da divisão */
     -fx-border-width: 1px;
 }
+
+.simulator_container {
+    -fx-spacing: 30px;
+    -fx-alignment: center;
+}
+
+.simulator_button {
+    -fx-background-color: #2b2b2b;
+    -fx-text-fill: #ffffff;
+    -fx-border-color: #ffffff;
+}
+.simulator_button:hover {
+    -fx-background-color: #363535;
+    -fx-cursor: hand;
+}
+.scroll-pane {
+    -fx-background-color: #2b2b2b; /* Cor de fundo do ScrollPane */
+    -fx-border-color: #444444; /* Cor da borda do ScrollPane */
+    -fx-border-width: 1px; /* Largura da borda do ScrollPane */
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: #2b2b2b; /* Cor de fundo da área de visualização */
+}
+
+.scroll-pane .scroll-bar {
+    -fx-background-color: #444444; /* Cor de fundo da barra de rolagem */
+}
+
+.scroll-pane .scroll-bar .thumb {
+    -fx-background-color: #666666; /* Cor do polegar da barra de rolagem */
+    -fx-background-radius: 5px; /* Raio de borda do polegar */
+}
+
+.scroll-pane .scroll-bar .track {
+    -fx-background-color: #2b2b2b; /* Cor do trilho da barra de rolagem */
+}
+
+
+#registersContainerVBox, #memoriesContainerVBox, #memoryContainerVBox {
+    -fx-background-color: #2b2b2b;
+    -fx-alignment: top-center;
+}
+
+.register-label, .value-field, .value-label, .memories-label, .memory-label, .memory-button, .address-label {
+    -fx-text-fill: white;
+    -fx-border-color: white;
+    -fx-border-width: 1px;
+    -fx-padding: 5px;
+    -fx-alignment: center;
+    -fx-pref-width: 300px; /* Ajuste conforme necessário */
+    -fx-pref-height: 30px; /* Ajuste conforme necessário */
+}
+.value-field {
+    -fx-background-color: #2b2b2b;
+}
+
+.register_button_container, .memories_button_container, .memory_button_container {
+    -fx-spacing: 10px;
+    -fx-alignment: center;
+}
+.back_button, .save_button {
+    -fx-background-color: #2b2b2b;
+    -fx-text-fill: #ffffff;
+    -fx-border-color: #ffffff;
+}
+.memory-button {
+    -fx-background-color: #2b2b2b;
+}
+.memory-button:hover {
+    -fx-background-color: #363535;
+    -fx-cursor: hand;
+}
+
+/* Estilo para o ScrollPane */
+#memoryScrollPane {
+    -fx-pref-height: 500px; /* Ajuste a altura conforme necessário */
+    -fx-fit-to-width: true;
+    -fx-fit-to-height: true;
+    -fx-alignment: top-center;
+}

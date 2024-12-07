@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" 
+      fx:controller="com.ipsim.SimulatorController" 
+      styleClass="simulator_container"
+      fx:id="registersContainerVBox">
+    <!-- Botão para voltar -->
+    <HBox styleClass="register_button_container">
+        <Button text="Back" onAction="#goBack" 
+                GridPane.columnIndex="0" GridPane.rowIndex="0" 
+                styleClass="back_button"/>
+        <Button text="Save" onAction="#saveRegisters" 
+                GridPane.columnIndex="1" GridPane.rowIndex="0" 
+                styleClass="save_button"/>
+    </HBox>
+    <GridPane fx:id="registersContainer">
+        <!-- Os registradores serão adicionados aqui -->
+    </GridPane>
+</VBox>

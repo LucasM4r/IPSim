@@ -11,7 +11,6 @@ public class App extends Application {
     public void start(Stage primaryStage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/ipsim/ide.fxml"));
         VBox root = loader.load();
-
         Scene scene = new Scene(root);
         scene.getStylesheets().add(getClass().getResource("/com/ipsim/styles/Styles.css").toExternalForm());
         primaryStage.setScene(scene);
