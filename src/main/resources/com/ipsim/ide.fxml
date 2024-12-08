@@ -55,11 +55,11 @@
     <!-- Área de edição -->
     <HBox fx:id="toggleButtonContainer"></HBox>
     <SplitPane orientation="VERTICAL" dividerPositions="0.7">
-    <ScrollPane fx:id="scrollPane" fitToWidth="true" fitToHeight="true">
+      <ScrollPane fx:id="scrollPane" fitToWidth="true" fitToHeight="true">
         <HBox>
             <!-- Área para os números das linhas -->
             <VBox fx:id="lineNumberFlow" 
-                  prefWidth="100"
+                  prefWidth="50"
                   styleClass="line-number-flow"/>
             
             <!-- TextArea principal para edição -->
