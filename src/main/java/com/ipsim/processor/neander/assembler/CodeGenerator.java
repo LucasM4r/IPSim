@@ -50,13 +50,10 @@ public class CodeGenerator {
                     break;
                 case VAR:
                     String varName = token.getValue();
-                    System.out.println("Depuração"); // Depuração
-                    System.out.println("VarName: " + varName); // Depuração
+
                     if (symbolTable.containsKey(varName)) {
-                        System.out.println("----------------------------------------");
-                        System.out.println(symbolTable.containsKey(varName));
+
                         int value = symbolTable.get(varName);
-                        System.out.println("name " + varName +"Valor: " + value); // Depuração
                         String binaryValue = convertToBinary(value);
                         binaryCode.append(binaryValue);
                     } else {

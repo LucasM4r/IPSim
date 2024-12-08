@@ -37,6 +37,7 @@ import com.ipsim.processor.neander.assembler.CodeGenerator;
 
 import com.ipsim.interfaces.Processor;
 import com.ipsim.processor.neander.cpu.NeanderProcessor;
+
 public class EditorController {   
     
     private File currentFile;
@@ -59,15 +60,17 @@ public class EditorController {
 
     public void initialize() {
         textEditor.textProperty().addListener((observable, oldValue, newValue) -> {
-            updateLineNumbers();
-            scrollToEnd(); // Adiciona a chamada para rolar até o fim
+            updateVisibleLineNumbers();
+            scrollToEnd(); 
         });
-        updateLineNumbers(); // Inicializa os números das linhas
-        scrollToEnd(); // Garante que o scroll comece no final
+        scrollPane.vvalueProperty().addListener((observable, oldValue, newValue) -> {
+            updateVisibleLineNumbers();
+        });
+        updateVisibleLineNumbers();
+        
         cpusArray.add((Processor)new NeanderProcessor());
         generateAsmButtons();
     }
-
 
     public String getContent() {
         return textEditor.getText();
@@ -77,41 +80,33 @@ public class EditorController {
         textEditor.setText(content);
     }
 
-    private void updateLineNumbers() {
+    private void updateVisibleLineNumbers() {
         String text = getContent();
-        int lineCount = text.split("\n", -1).length;
-        
-        lineNumberFlow.getChildren().clear(); // Limpa os números das linhas antigos
+        int totalLines = text.split("\n", -1).length;
 
-        for (int i = 1; i <= lineCount; i++) {
-            Label lineNumberLabel = new Label(i + ""); // Cria um novo Label para cada número de linha
-            lineNumberLabel.getStyleClass().add("line-number"); // Adiciona a classe CSS
+        double scrollValue = scrollPane.getVvalue();
+        double visibleHeight = scrollPane.getViewportBounds().getHeight();
+        double lineHeight = textEditor.getFont().getSize() + 2; // Estimativa do tamanho da linha
+        int linesPerPage = (int) (visibleHeight / lineHeight);
 
+        int startLine = Math.max(1, (int) (scrollValue * (totalLines - linesPerPage)));
+        int endLine = Math.min(totalLines, startLine + linesPerPage);
+
+        lineNumberFlow.getChildren().clear();
+
+        for (int i = startLine; i <= endLine; i++) {
+            Label lineNumberLabel = new Label(String.valueOf(i));
+            lineNumberLabel.getStyleClass().add("line-number");
             lineNumberFlow.getChildren().add(lineNumberLabel);
         }
     }
 
-
-
-    private void scrollToEnd() {
-        Platform.runLater(() -> {
-            Timeline timeline = new Timeline(new KeyFrame(
-                Duration.millis(5), 
-                ae -> scrollPane.setVvalue(1.0)
-            ));
-            timeline.play();
-        });
-    }
-
-
     private void generateAsmButtons() {
-
         for (Processor processor : cpusArray) {
-
             ToggleButton button = new ToggleButton(processor.getName());
             toggleButtonContainer.getChildren().add(button);
             button.setToggleGroup(toggleGroup);
-            if(currentProcessor == null && !cpusArray.isEmpty()) {
+            if (currentProcessor == null && !cpusArray.isEmpty()) {
                 currentProcessor = cpusArray.get(0);
                 button.setSelected(true);
             }
@@ -123,7 +118,7 @@ public class EditorController {
 
     @FXML
     private void compile() {
-        errorConsole.clear(); // Limpar o console de erros antes de compilar
+        errorConsole.clear();
         if (currentFile == null) {
             if (!textEditor.getText().isEmpty()) {
                 FileChooser fileChooser = new FileChooser();
@@ -134,7 +129,7 @@ public class EditorController {
                         Files.write(file.toPath(), textEditor.getText().getBytes());
                         currentFile = file;
                         compileAndSaveBinary(currentFile);
-                    } catch (IOException | LexicalAnalyzer.LexicalException | SyntacticAnalyzer.SyntacticException | SemanticAnalyzer.SemanticException | CodeGenerator.CodeGenerationException e) {
+                    } catch (Exception e) {
                         errorConsole.appendText("Compilation failed: " + e.getMessage() + "\n");
                     }
                 }
@@ -145,18 +140,14 @@ public class EditorController {
             try {
                 Files.write(Paths.get(currentFile.getAbsolutePath()), textEditor.getText().getBytes());
                 compileAndSaveBinary(currentFile);
-
-            } catch (IOException | LexicalException | SyntacticAnalyzer.SyntacticException | SemanticAnalyzer.SemanticException | CodeGenerator.CodeGenerationException e) {
+            } catch (Exception e) {
                 errorConsole.appendText("Compilation failed: " + e.getMessage() + "\n");
             }
         }
     }
 
-
     private void compileAndSaveBinary(File file) throws IOException, LexicalException, SyntacticAnalyzer.SyntacticException, SemanticAnalyzer.SemanticException, CodeGenerator.CodeGenerationException {
-        // Ler o conteúdo do arquivo e converter para String
         String binaryCode = currentProcessor.compile(file);
-        // Abrir diálogo "Salvar como" para salvar o arquivo binário
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Binary Files", "*.bin"));
         File binaryFile = fileChooser.showSaveDialog(new Stage());
@@ -167,18 +158,16 @@ public class EditorController {
 
     @FXML
     private void show() {
-        // Lógica para executar o código
         try {
             createSecondStage();
-            
         } catch (Exception e) {
             e.printStackTrace();
             errorConsole.appendText("Failed to create second stage: " + e.getMessage() + "\n");
         }
     }
+
     @FXML
     private void run() {
-        // Lógica para executar o código
         try {
             currentProcessor.compile(currentFile);
             currentProcessor.executeProgram();
@@ -203,6 +192,7 @@ public class EditorController {
             }
         }
     }
+
     @FXML
     private void createNewFile() {
         if (!textEditor.getText().isEmpty()) {
@@ -220,14 +210,14 @@ public class EditorController {
             Optional<ButtonType> result = alert.showAndWait();
             if (result.get() == buttonTypeSave) {
                 if (!saveFile()) {
-                    return; // Se o arquivo não foi salvo, cancela a operação de criar um novo arquivo
+                    return;
                 }
             } else if (result.get() == buttonTypeCancel) {
-                return; // Cancela a operação de criar um novo arquivo
+                return;
             }
         }
         textEditor.clear();
-        currentFile = null; // Reseta o arquivo atual
+        currentFile = null;
     }
 
     @FXML
@@ -253,7 +243,7 @@ public class EditorController {
         if (file != null) {
             try {
                 Files.write(Paths.get(file.getAbsolutePath()), textEditor.getText().getBytes());
-                currentFile = file; // Atualiza o arquivo atual
+                currentFile = file;
                 return true;
             } catch (IOException e) {
                 e.printStackTrace();
@@ -262,6 +252,7 @@ public class EditorController {
         }
         return false;
     }
+
     private void createSecondStage() throws Exception {
         Stage secondStage = new Stage();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/ipsim/simulator.fxml"));
@@ -277,4 +268,14 @@ public class EditorController {
         SimulatorController.setStage(secondStage);
         SimulatorController.setCurrentProcessor(currentProcessor);
     }
+    @FXML
+    private void scrollToEnd() {
+        Platform.runLater(() -> {
+            double caretPosition = textEditor.getCaretPosition();
+            double max = textEditor.getLength();
+            double value = caretPosition / max;
+            scrollPane.setVvalue(value);
+        });
+    }
+
 }
