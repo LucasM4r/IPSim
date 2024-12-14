@@ -1,3 +1,8 @@
+/**
+ * The SimulatorController class is used to control the simulation tab.
+ * @author Lucas Marchesan da Silva
+ * @version 1.0
+ */
 package com.ipsim;
 
 import com.ipsim.components.Register;
@@ -31,34 +36,39 @@ public class SimulatorController {
     private static HashMap<String, TextField> registerFields = new HashMap<>();
     private static List<TextField> memoryFields = new ArrayList<>();
 
-    public void initialize(Processor currentProcessor, Stage stage) {
-        SimulatorController.currentProcessor = currentProcessor;
-        SimulatorController.stage = stage;
-    }
-
+    /**
+     * The method setStage() is used to set the stage of the simulation tab.
+     * @param stage
+     */
     public static void setStage(Stage stage) {
         SimulatorController.stage = stage;
     }
-
+    /**
+     * The setCurrentProcessor() method is used to set the current processor.
+     * @param processor
+     */
     public static void setCurrentProcessor(Processor processor) {
         SimulatorController.currentProcessor = processor;
     }
 
     @FXML
+    /**
+     * The method showRegisters() is used to display the 
+     * processor registers when modifying the scene.
+     * @throws IOException
+     */
     public void showRegisters() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/ipsim/registers_page.fxml"));
             Parent root = loader.load();
             Scene scene = new Scene(root);
             scene.getStylesheets().add(getClass().getResource("/com/ipsim/styles/Styles.css").toExternalForm());
-
-            // Obtém os registradores do currentProcessor
             HashMap<String, Register> registers = currentProcessor.getDatapath().getRegisters();
 
-            // Limpa o mapa de registradores
+            // Clear the register map
             registerFields.clear();
 
-            // Adiciona os registradores ao layout
+            // Add the registers to the layout
             VBox vbox = (VBox) root.lookup("#registersContainerVBox");
             if (vbox != null) {
                 GridPane gridPane = (GridPane) vbox.lookup("#registersContainer");
@@ -74,6 +84,7 @@ public class SimulatorController {
                     gridPane.add(valueHeader, 1, 0);
 
                     int row = 1;
+                    // Iterate over the registers and add them to the layout
                     for (HashMap.Entry<String, Register> entry : registers.entrySet()) {
                         Label registerLabel = new Label(entry.getKey());
                         registerLabel.getStyleClass().add("register-label");
@@ -83,19 +94,14 @@ public class SimulatorController {
                         valueField.getStyleClass().add("value-field");
                         gridPane.add(valueField, 1, row);
 
-                        // Atualiza o mapa de registradores
+                        // Update the register map
                         registerFields.put(entry.getKey(), valueField);
 
                         row++;
                     }
-                } else {
-                    throw new NullPointerException("GridPane 'registersContainer' not found");
                 }
-            } else {
-                throw new NullPointerException("VBox 'registersContainerVBox' not found");
             }
-
-            stage.setScene(scene); // Define a nova cena
+            stage.setScene(scene);
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
@@ -104,24 +110,32 @@ public class SimulatorController {
 
 
     @FXML
+    /**
+     * The method saveRegisters() is used to save 
+     * the values of the registers in the processor.
+     * no processador.
+     * @throws NumberFormatException
+     */
     public void saveRegisters() {
         if (registerFields == null || registerFields.isEmpty()) {
             throw new NullPointerException("Register fields not found");
         }
 
+        // Get the registers from the processor
         HashMap<String, Register> registers = currentProcessor.getDatapath().getRegisters();
+        // Iterate over the register fields and update the register values        
         for (HashMap.Entry<String, TextField> entry : registerFields.entrySet()) {
             String registerName = entry.getKey();
             TextField valueField = entry.getValue();
             String value = valueField.getText();
             try {
                 int registerValue;
-                if (value.startsWith("0x")) {
-                    // Valor em hexadecimal
+                if (value.endsWith("0x")) {
+                    // Hexadecimal value
                     value = value.substring(2);
                     registerValue = Integer.parseInt(value, 16);
                 } else {
-                    // Valor em decimal
+                    // Decimal value
                     registerValue = Integer.parseInt(value);
                 }
                 registers.get(registerName).write(registerValue);
@@ -131,10 +145,11 @@ public class SimulatorController {
         }
     }
     @FXML
+    /**
+     * The method goBack() is used to return to the previous scene.
+     * 
+     */
     public void goBack() {
-        if (stage == null) {
-            throw new NullPointerException("Stage is null");
-        }
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/ipsim/simulator.fxml"));
             Parent root = loader.load();
@@ -149,6 +164,10 @@ public class SimulatorController {
     }
 
     @FXML
+    /**
+     * The method showMemories() is used to display the memory list.
+     * @throws IOException
+     */
     public void showMemories() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/ipsim/memories_page.fxml"));
@@ -162,7 +181,7 @@ public class SimulatorController {
                 GridPane gridPane = (GridPane) vbox.lookup("#memoriesContainer");
                 if(gridPane != null) {
                     gridPane.getChildren().clear();
-
+                    // Add the memories to the layout
                     Label memoriesHeader = new Label("Memory");
                     memoriesHeader.getStyleClass().add("memories-label");
                     gridPane.add(memoriesHeader, 0, 0);
@@ -172,6 +191,7 @@ public class SimulatorController {
                     gridPane.add(valueHeader, 1, 0);
 
                     int row = 1;
+                    // Iterate over the memories and add them to the layout
                     for(HashMap.Entry<String, Memory> entry : memories.entrySet()) {
                         Label memoryLabel = new Label(entry.getKey());
                         memoryLabel.getStyleClass().add("memory-label");
@@ -188,12 +208,16 @@ public class SimulatorController {
                     }
                 }
             }
-            stage.setScene(scene); // Define a nova cena
+            stage.setScene(scene);
             stage.show();
         }catch(IOException e){
             e.printStackTrace();
         }
     }
+    /**
+     * The method showMemory() is used to display the selected memory.
+     * @param memoryName
+     */
     private void showMemory(String memoryName) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/ipsim/memory_page.fxml"));
@@ -208,6 +232,7 @@ public class SimulatorController {
                 GridPane gridPane = (GridPane) scrollPane.getContent();
                 if (gridPane != null) {
                     gridPane.getChildren().clear();
+                    // Add the memory to the layout
                     Label memoryHeader = new Label("Address");
                     memoryHeader.getStyleClass().add("address-label");
                     gridPane.add(memoryHeader, 0, 0);
@@ -215,6 +240,7 @@ public class SimulatorController {
                     valueHeader.getStyleClass().add("value-label");
                     gridPane.add(valueHeader, 1, 0);
                     int row = 1;
+                    // Iterate over the memory and add the values to the layout
                     for (int i = 0; i < memory.getSize(); i++) {
                         Label addressLabel = new Label("0x" + Integer.toHexString(i));
                         addressLabel.getStyleClass().add("address-label");
@@ -225,11 +251,7 @@ public class SimulatorController {
                         memoryFields.add(valueField);
                         row++;
                     }
-                } else {
-                    throw new NullPointerException("GridPane 'memoryContainer' not found");
                 }
-            } else {
-                throw new NullPointerException("ScrollPane 'memoryScrollPane' not found");
             }
             stage.setScene(scene);
             stage.show();
@@ -239,6 +261,10 @@ public class SimulatorController {
     }
 
     @FXML
+    /**
+     * The method saveMemory() is used to save the memory values.
+     * @throws NumberFormatException
+     */
     private void saveMemory() {
         Memory memory = currentProcessor.getDatapath().getMemories().get("dataProgram");
         if (memory == null) {
@@ -250,15 +276,16 @@ public class SimulatorController {
             try {
                 int memoryValue;
                 if (value.startsWith("0x")) {
-                    // Valor em hexadecimal
+                    // Hexadecimal value
                     value = value.substring(2);
                     memoryValue = Integer.parseInt(value, 16);
                 } else {
-                    // Valor em decimal
+                    // Decimal value
                     memoryValue = Integer.parseInt(value);
                 }
                 int index = memoryFields.indexOf(valueField);
-                if (index >= 0 && index < memory.getSize()) { // Verifique se o índice está dentro do intervalo
+                if (index >= 0 && index < memory.getSize()) {
+                    // verify if the index is valid and write the value
                     memory.write(index, memoryValue);
                 }
             } catch (NumberFormatException e) {

@@ -1,25 +1,30 @@
-package com.ipsim.processor.neander.assembler;
+package com.ipsim.processor.neander3.assembler;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Iterator;
 
-import com.ipsim.processor.neander.assembler.LexicalAnalyzer.TokenType;
-
-public class SemanticAnalyzer {
+import com.ipsim.exceptions.SemanticException;
+public class NeanderSemanticAnalyzer3 {
 
     private Map<String, Integer> symbolTable = new HashMap<>();
 
-    public SemanticAnalyzer(Map<String, Integer> symbolTable) {
+    public NeanderSemanticAnalyzer3(Map<String, Integer> symbolTable) {
         this.symbolTable = symbolTable;
     }
-    public void analyze(List<LexicalAnalyzer.Token> tokens) throws SemanticException {
+    
+    /** 
+     * The analyze method processes the tokens and checks for semantic errors
+     * @param tokens
+     * @throws SemanticException
+     */
+    public void analyze(List<NeanderLexicalAnalyzer3.Token> tokens) throws SemanticException {
         int address = 0;
-        Iterator<LexicalAnalyzer.Token> iterator = tokens.iterator();
+        Iterator<NeanderLexicalAnalyzer3.Token> iterator = tokens.iterator();
         
         while (iterator.hasNext()) {
-            LexicalAnalyzer.Token token = iterator.next();
+            NeanderLexicalAnalyzer3.Token token = iterator.next();
             // Process the token here
             switch (token.getType()) {
                 case LABEL:
@@ -39,22 +44,23 @@ public class SemanticAnalyzer {
                 case VALUE:
                     address++;
                     break;
+                case PSEUDO_INSTRUCTION:
+                    if(!token.getValue().equalsIgnoreCase("ORG")) {
+                        break;
+                    }
+                    if(!iterator.hasNext()) {
+                        throw new SemanticException("Invalid ORG directive");
+                    }
+                    NeanderLexicalAnalyzer3.Token nextToken = iterator.next();
+                    if(nextToken.getType() == NeanderLexicalAnalyzer3.TokenType.VALUE) {
+                        address = convertAddress(nextToken.getValue());
+                    } else {
+                        throw new SemanticException("Invalid ORG directive");
+                    }
+                    break;
                 case WHITESPACE:
                 case UNKNOWN:
                 case EOF:
-                case PSEUDO_INSTRUCTION:
-                    if (token.getValue().equalsIgnoreCase("ORG")) {
-                        if (iterator.hasNext()) {
-                            LexicalAnalyzer.Token nextToken = iterator.next();
-                            if (nextToken.getType() == TokenType.VALUE) {
-                            } else {
-                                throw new SemanticException("Invalid ORG directive");
-                            }
-                        } else {
-                            throw new SemanticException("Invalid ORG directive");
-                        }
-                        
-                    }
                 case COMMENT:
                     // No action needed for these token types
                     break;
@@ -62,10 +68,18 @@ public class SemanticAnalyzer {
         }
     }
 
+    /**
+     * Get the symbol table
+     * @return
+     */
     public Map<String, Integer> getSymbolTable() {
         return symbolTable;
     }
-
+    /**
+     * Convert a value to binary
+     * @param value
+     * @return
+     */
     public String convertToBinary(String value) {
         if (value.toLowerCase().endsWith("h")) {
             String hexValue = value.substring(0, value.length() - 1);
@@ -75,7 +89,11 @@ public class SemanticAnalyzer {
         int decimalValue = Integer.parseInt(value);
         return Integer.toBinaryString(decimalValue);
     }
-
+    /**
+     * Convert a value to decimal
+     * @param value
+     * @return
+     */
     public int convertToDecimal(String value) {
         if (value.toLowerCase().endsWith("h")) {
             String hexValue = value.substring(0, value.length() - 1);
@@ -84,17 +102,16 @@ public class SemanticAnalyzer {
         return Integer.parseInt(value);
     }
 
+    /**
+     * Convert an address to decimal
+     * @param value
+     * @return
+     */
     public Integer convertAddress(String value) {
         if (value.toLowerCase().endsWith("h")) {
             String hexValue = value.substring(0, value.length() - 1);
             return Integer.parseInt(hexValue, 16);
         }
         return Integer.parseInt(value);
-    }
-
-    public static class SemanticException extends Exception {
-        public SemanticException(String message) {
-            super(message);
-        }
     }
 }

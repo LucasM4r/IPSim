@@ -1,0 +1,174 @@
+package com.ipsim.processor.neander.assembler;
+
+import com.ipsim.exceptions.CodeGenerationException;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+public class NeanderCodeGenerator {
+
+    private static final Map<String, String> INSTRUCTION_MAP = new HashMap<>();
+    private Map<String, Integer> symbolTable;
+
+    static {
+        INSTRUCTION_MAP.put("NOP", "0000");
+        INSTRUCTION_MAP.put("STA", "0001");
+        INSTRUCTION_MAP.put("LDA", "0010");
+        INSTRUCTION_MAP.put("ADD", "0011");
+        INSTRUCTION_MAP.put("OR", "0100");
+        INSTRUCTION_MAP.put("AND", "0101");
+        INSTRUCTION_MAP.put("NOT", "0110");
+        INSTRUCTION_MAP.put("JMP", "1000");
+        INSTRUCTION_MAP.put("JN", "1001");
+        INSTRUCTION_MAP.put("JZ", "1010");
+        INSTRUCTION_MAP.put("HLT", "1111");
+    }
+
+    /**
+     * The NeanderCodeGenerator constructor initializes the symbol table
+     * @param symbolTable
+     */
+    public NeanderCodeGenerator(Map<String, Integer> symbolTable) {
+        this.symbolTable = symbolTable;
+        System.out.println(symbolTable);
+    }
+
+    
+    /** 
+     * The generate method processes the tokens and generates the binary code
+     * @param tokens
+     * @return String
+     * @throws CodeGenerationException
+     */
+    public String generate(List<NeanderLexicalAnalyzer.Token> tokens) throws CodeGenerationException {
+        StringBuilder binaryCode = new StringBuilder();
+        Iterator<NeanderLexicalAnalyzer.Token> iterator = tokens.iterator();
+
+        while (iterator.hasNext()) {
+
+            NeanderLexicalAnalyzer.Token token = iterator.next();
+            switch (token.getType()) {
+                case INSTRUCTION:
+                    // Get the instruction from the instruction map
+                    String instruction = INSTRUCTION_MAP.get(token.getValue().toUpperCase());
+                    binaryCode.append(extendInstruction(instruction));
+                    break;
+                case LABEL:
+                    // Ignore labels
+                    break;
+                case VAR:
+                    // Get the variable value from the symbol table
+                    String varName = token.getValue();
+                    if (symbolTable.containsKey(varName)) {
+
+                        int value = symbolTable.get(varName);
+                        String binaryValue = convertToBinary(value);
+                        binaryCode.append(binaryValue);
+                    } else {
+                        throw new CodeGenerationException("Undefined variable: " + varName);
+                    }
+                    break;
+                case VALUE:
+                    Integer value = Integer.parseInt(token.getValue());
+                    String binaryValue = convertToBinary(value);
+                    binaryCode.append(binaryValue);                    
+                    break;
+                case PSEUDO_INSTRUCTION:
+                    if(!iterator.hasNext()) {
+                        break;
+                    }
+                    if (token.getValue().equalsIgnoreCase("org")) {
+                        token = iterator.next();
+                        if(token.getType() != NeanderLexicalAnalyzer.TokenType.VALUE) {
+                            break;
+                        }
+                        int orgPosition = parseValue(token.getValue());
+                        
+                        int currentPosition = binaryCode.length() / 8;
+                        int zerosToInsert = Math.max(orgPosition - currentPosition, 0);
+                        for (int i = 0; i < zerosToInsert; i++) {
+                            binaryCode.append("00000000"); // Add 8 zeros until the specified position
+                            
+                            
+                        }
+                    }else if(token.getValue().equalsIgnoreCase("db")) {
+
+                        if(!iterator.hasNext()) {
+                            break;
+                        }
+                        token = iterator.next();
+                        if(token.getType() != NeanderLexicalAnalyzer.TokenType.VALUE) {
+                            break;
+                        }
+                        int dbValue = parseValue(token.getValue());
+                        String dbBinaryValue = convertToBinary(dbValue);
+                        binaryCode.append(dbBinaryValue);
+                        
+                    }
+                    break;
+                case COMMENT:
+                case WHITESPACE:
+                    // Ignore labels, comments, and whitespace
+                    break;
+                case EOF:
+                    // Stop generating code after EOF
+                    return binaryCode.toString();
+                default:
+                    throw new CodeGenerationException("Unexpected token: " + token.getValue());
+            }
+        }
+
+        return binaryCode.toString();
+    }
+    /**
+     * Extend the bits of a binary string to a specified length
+     * @param binary
+     * @param length
+     * @param padRight
+     * @return
+     */
+    private String extendBits(String binary, int length, boolean padRight) {
+        if(!(binary.length()<length)) {
+            return binary;
+        }
+        if (padRight) {
+            return String.format("%-" + length + "s", binary).replace(' ', '0');
+        }
+        return String.format("%" + length + "s", binary).replace(' ', '0');
+    }
+
+    /**
+     * The extendInstruction method extends the bits of an instruction to 8 bits
+     * @param binary
+     * @return
+     */
+    private String extendInstruction(String binary) {
+        return extendBits(binary, 8, true);
+    }
+
+    /**
+     * The convertToBinary method converts an integer value to a binary string
+     * @param value
+     * @return
+     */
+    private String convertToBinary(int value) {
+        String binaryString = Integer.toBinaryString(value);
+        // Ensure the binary string is 8 bits long
+        return extendBits(binaryString, 8, false);
+    }
+    /**
+     * Parse a value string to an integer
+     * @param valueStr
+     * @return
+     * @throws NumberFormatException
+     */
+    private int parseValue(String valueStr) throws NumberFormatException {
+        if (valueStr.endsWith("h")) {
+            return Integer.parseInt(valueStr.substring(0, valueStr.length() - 1), 16);
+        } else {
+            return Integer.parseInt(valueStr);
+        }
+    }
+    
+}

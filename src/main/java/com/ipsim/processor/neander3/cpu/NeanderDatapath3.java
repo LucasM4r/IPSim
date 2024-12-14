@@ -1,4 +1,4 @@
-package com.ipsim.processor.neander.cpu;
+package com.ipsim.processor.neander3.cpu;
 
 import com.ipsim.interfaces.DataPath;
 import com.ipsim.components.Memory;
@@ -6,7 +6,7 @@ import com.ipsim.components.Register;
 
 import java.util.HashMap;
 import java.util.List;
-public class NeanderDatapath extends DataPath {
+public class NeanderDatapath3 extends DataPath {
 
     boolean programEnd = false;
     int programCounter = 0;
@@ -14,12 +14,10 @@ public class NeanderDatapath extends DataPath {
     /**
      * The constructor initializes the datapath
      */
-    public NeanderDatapath() {
+    public NeanderDatapath3() {
         super();
         addMemory("dataProgram", new Memory(256, 8));
         addRegister("AC", new Register(8));
-        addRegister("Z", new Register(1));
-        addRegister("N", new Register(1));
     }
 
     
@@ -42,28 +40,23 @@ public class NeanderDatapath extends DataPath {
                 break;
             case "LDA":
                 int ldaValue = loadMemory("dataProgram", (Integer) arguments.get(0));
-                storeRegister("AC", ldaValue & 0xFF); // Apply the 8-bit mask
-                updateFlags();
+                storeRegister("AC", ldaValue & 0xFF); // Aplica a máscara de 8 bits
                 break;
             case "ADD":
                 int addValue = loadRegister("AC") + loadMemory("dataProgram", (Integer) arguments.get(0));
-                storeRegister("AC", addValue & 0xFF); // Apply the 8-bit mask
-                updateFlags();
+                storeRegister("AC", addValue & 0xFF); // Aplica a máscara de 8 bits
                 break;
             case "OR":
                 int orValue = loadRegister("AC") | loadMemory("dataProgram", (Integer) arguments.get(0));
-                storeRegister("AC", orValue & 0xFF);  // Apply the 8-bit mask
-                updateFlags();
+                storeRegister("AC", orValue & 0xFF); // Aplica a máscara de 8 bits
                 break;
             case "AND":
                 int andValue = loadRegister("AC") & loadMemory("dataProgram", (Integer) arguments.get(0));
-                storeRegister("AC", andValue & 0xFF); // Apply the 8-bit mask
-                updateFlags();
+                storeRegister("AC", andValue & 0xFF); // Aplica a máscara de 8 bits
                 break;
             case "NOT":
-                int notValue = ~loadRegister("AC") & 0xFF;  // Apply the 8-bit mask
+                int notValue = ~loadRegister("AC") & 0xFF; // Aplica a máscara de 8 bits
                 storeRegister("AC", notValue);
-                updateFlags();
                 break;
             case "JMP":
                 programCounter = (Integer) arguments.get(0);
@@ -74,7 +67,7 @@ public class NeanderDatapath extends DataPath {
                 }
                 break;
             case "JZ":
-                if ((loadRegister("AC")) == 0) {
+                if ((loadRegister("AC")) == 0) { // Aplica a máscara de 8 bits antes de comparar
                     programCounter = (Integer) arguments.get(0);
                 }
                 break;
@@ -160,12 +153,5 @@ public class NeanderDatapath extends DataPath {
             memories.get("dataProgram").write(i, 0);
         }
     }
-    /** 
-     * The updateFlags method updates the flags in the datapath.
-    */
-    public void updateFlags() {
-        int acValue = loadRegister("AC");
-        storeRegister("Z", (acValue == 0) ? 1 : 0);
-        storeRegister("N", (acValue < 0) ? 1 : 0);
-    }
+    
 }

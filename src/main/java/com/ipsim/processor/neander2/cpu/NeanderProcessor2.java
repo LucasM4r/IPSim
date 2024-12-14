@@ -1,6 +1,6 @@
-package com.ipsim.processor.neander.cpu;
-import com.ipsim.processor.neander.assembler.*;
-import com.ipsim.processor.neander.assembler.NeanderLexicalAnalyzer.Token;
+package com.ipsim.processor.neander2.cpu;
+import com.ipsim.processor.neander2.assembler.*;
+import com.ipsim.processor.neander2.assembler.NeanderLexicalAnalyzer2.Token;
 
 import com.ipsim.interfaces.Processor;
 import java.io.File;
@@ -16,13 +16,13 @@ import com.ipsim.exceptions.SyntacticException;
 
 import com.ipsim.interfaces.DataPath;
 
-public class NeanderProcessor extends Processor {
+public class NeanderProcessor2 extends Processor {
 
-    public NeanderControlpath controlpath;
-    public NeanderDatapath datapath;
-    public NeanderProcessor() {
-        controlpath = new NeanderControlpath();
-        datapath = new NeanderDatapath();
+    public NeanderControlpath2 controlpath;
+    public NeanderDatapath2 datapath;
+    public NeanderProcessor2() {
+        controlpath = new NeanderControlpath2();
+        datapath = new NeanderDatapath2();
     }
 
     public String getName() {
@@ -44,19 +44,19 @@ public class NeanderProcessor extends Processor {
         
         String input = new String(Files.readAllBytes(file.toPath()));
         // Lexical analysis
-        NeanderLexicalAnalyzer lexicalAnalyzer = new NeanderLexicalAnalyzer();
+        NeanderLexicalAnalyzer2 lexicalAnalyzer = new NeanderLexicalAnalyzer2();
         List<Token> tokens = lexicalAnalyzer.analyze(input);
 
         // Syntactic analysis
-        NeanderSyntacticAnalyzer syntacticAnalyzer = new NeanderSyntacticAnalyzer();
+        NeanderSyntacticAnalyzer2 syntacticAnalyzer = new NeanderSyntacticAnalyzer2();
         syntacticAnalyzer.analyze(tokens);
 
         // Semantic analysis
-        NeanderSemanticAnalyzer semanticAnalyzer = new NeanderSemanticAnalyzer(syntacticAnalyzer.getSymbolTable());
+        NeanderSemanticAnalyzer2 semanticAnalyzer = new NeanderSemanticAnalyzer2(syntacticAnalyzer.getSymbolTable());
         semanticAnalyzer.analyze(tokens);
 
         // Code generation
-        NeanderCodeGenerator codeGenerator = new NeanderCodeGenerator(semanticAnalyzer.getSymbolTable());
+        NeanderCodeGenerator2 codeGenerator = new NeanderCodeGenerator2(semanticAnalyzer.getSymbolTable());
         String binaryCode = codeGenerator.generate(tokens);
         System.out.println("Generated binary code: " + binaryCode);
         datapath.loadProgram(binaryCode);

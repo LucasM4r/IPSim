@@ -1,11 +1,12 @@
-package com.ipsim.processor.neander.assembler;
+package com.ipsim.processor.neander3.assembler;
+
+import com.ipsim.exceptions.CodeGenerationException;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-public class CodeGenerator {
+public class NeanderCodeGenerator3 {
 
     private static final Map<String, String> INSTRUCTION_MAP = new HashMap<>();
     private Map<String, Integer> symbolTable;
@@ -24,22 +25,29 @@ public class CodeGenerator {
         INSTRUCTION_MAP.put("HLT", "1111");
     }
 
-    public CodeGenerator(Map<String, Integer> symbolTable) {
+    /**
+     * The NeanderCodeGenerator constructor initializes the symbol table
+     * @param symbolTable
+     */
+    public NeanderCodeGenerator3(Map<String, Integer> symbolTable) {
         this.symbolTable = symbolTable;
         System.out.println(symbolTable);
     }
 
-    public String generate(List<LexicalAnalyzer.Token> tokens) throws CodeGenerationException {
+    
+    /** 
+     * The generate method processes the tokens and generates the binary code
+     * @param tokens
+     * @return String
+     * @throws CodeGenerationException
+     */
+    public String generate(List<NeanderLexicalAnalyzer3.Token> tokens) throws CodeGenerationException {
         StringBuilder binaryCode = new StringBuilder();
-        Iterator<LexicalAnalyzer.Token> iterator = tokens.iterator();
-        while (iterator.hasNext()) {
-            LexicalAnalyzer.Token token = iterator.next();
-            System.out.println("Depuração"); // Depuração
-            System.out.println("----------------------------------------"); // Depuração
-            System.out.println("Tokens: " + token); // Depuração
-            System.out.println(symbolTable);
-            System.out.println("----------------------------------------"); // Depuração
+        Iterator<NeanderLexicalAnalyzer3.Token> iterator = tokens.iterator();
 
+        while (iterator.hasNext()) {
+
+            NeanderLexicalAnalyzer3.Token token = iterator.next();
             switch (token.getType()) {
                 case INSTRUCTION:
                     String instruction = INSTRUCTION_MAP.get(token.getValue().toUpperCase());
@@ -66,35 +74,37 @@ public class CodeGenerator {
                     binaryCode.append(binaryValue);                    
                     break;
                 case PSEUDO_INSTRUCTION:
-                    if (iterator.hasNext()) {
-                        if (token.getValue().equalsIgnoreCase("org")) {
-                            token = iterator.next();
-                            System.out.println("Depuração"); // Depuração
-                            System.out.println("Token: " + token.getValue()); // Depuração
-                            if (token.getType() == LexicalAnalyzer.TokenType.VALUE) {
-                                int orgPosition = Integer.parseInt(token.getValue());
-                                int currentPosition = binaryCode.length() / 8; // Cada instrução ocupa 8 bits
-                                int zerosToInsert = orgPosition - currentPosition;
-                                if (zerosToInsert > 0) {
-                                    for (int i = 0; i < zerosToInsert; i++) {
-                                        binaryCode.append("00000000"); // Adiciona 8 zeros para cada posição
-                                        System.out.println("Adicionando 8 zeros para a posição " + (currentPosition + i)); // Depuração
-                                    }
-                                }
-                            }
-                        }else if(token.getValue().equalsIgnoreCase("db")) {
-
-                            if(iterator.hasNext()) {
-                                token = iterator.next();
-                                if(token.getType() == LexicalAnalyzer.TokenType.VALUE) {
-                                    int dbValue = Integer.parseInt(token.getValue());
-                                    String dbBinaryValue = convertToBinary(dbValue);
-                                    binaryCode.append(dbBinaryValue);
-                                }
-                            }
-                        }
+                    if(!iterator.hasNext()) {
                         break;
                     }
+                    if (token.getValue().equalsIgnoreCase("org")) {
+                        token = iterator.next();
+                        if(token.getType() != NeanderLexicalAnalyzer3.TokenType.VALUE) {
+                            break;
+                        }
+                        int orgPosition = Integer.parseInt(token.getValue());
+                        int currentPosition = binaryCode.length() / 8;
+                        int zerosToInsert = Math.max(orgPosition - currentPosition, 0);
+                        for (int i = 0; i < zerosToInsert; i++) {
+                            binaryCode.append("00000000"); // Add 8 zeros until the specified position
+                            
+                            
+                        }
+                    }else if(token.getValue().equalsIgnoreCase("db")) {
+
+                        if(!iterator.hasNext()) {
+                            break;
+                        }
+                        token = iterator.next();
+                        if(token.getType() != NeanderLexicalAnalyzer3.TokenType.VALUE) {
+                            break;
+                        }
+                        int dbValue = Integer.parseInt(token.getValue());
+                        String dbBinaryValue = convertToBinary(dbValue);
+                        binaryCode.append(dbBinaryValue);
+                        
+                    }
+                    break;
                 case COMMENT:
                 case WHITESPACE:
                     // Ignore labels, comments, and whitespace
@@ -109,29 +119,37 @@ public class CodeGenerator {
 
         return binaryCode.toString();
     }
-
-    public static class CodeGenerationException extends Exception {
-        public CodeGenerationException(String message) {
-            super(message);
-        }
-    }
-
+    /**
+     * Extend the bits of a binary string to a specified length
+     * @param binary
+     * @param length
+     * @param padRight
+     * @return
+     */
     private String extendBits(String binary, int length, boolean padRight) {
-        if (binary.length() < length) {
-            if (padRight) {
-                return String.format("%-" + length + "s", binary).replace(' ', '0');
-            } else {
-                return String.format("%" + length + "s", binary).replace(' ', '0');
-            }
-        } else {
+        if(!(binary.length()<length)) {
             return binary;
         }
+        if (padRight) {
+            return String.format("%-" + length + "s", binary).replace(' ', '0');
+        }
+        return String.format("%" + length + "s", binary).replace(' ', '0');
     }
 
+    /**
+     * The extendInstruction method extends the bits of an instruction to 8 bits
+     * @param binary
+     * @return
+     */
     private String extendInstruction(String binary) {
         return extendBits(binary, 8, true);
     }
 
+    /**
+     * The convertToBinary method converts an integer value to a binary string
+     * @param value
+     * @return
+     */
     private String convertToBinary(int value) {
         String binaryString = Integer.toBinaryString(value);
         // Ensure the binary string is 8 bits long

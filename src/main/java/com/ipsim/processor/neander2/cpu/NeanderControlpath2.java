@@ -1,10 +1,10 @@
-package com.ipsim.processor.neander.cpu;
+package com.ipsim.processor.neander2.cpu;
 
 import com.ipsim.interfaces.ControlPath;
 
-public class NeanderControlpath implements ControlPath {
+public class NeanderControlpath2 implements ControlPath {
     
-    public NeanderControlpath() {
+    public NeanderControlpath2() {
     }
 
     
