@@ -4,6 +4,6 @@ package com.ipsim.exceptions;
 */
 public class LexicalException extends Exception {
     public LexicalException(String message) {
-        super(message);
+        super("Lexical Exception: " + message);
     }
 }

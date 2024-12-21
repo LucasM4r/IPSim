@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
 public class SimulatorController {
 
@@ -290,6 +291,27 @@ public class SimulatorController {
                 }
             } catch (NumberFormatException e) {
                 throw new NumberFormatException("Invalid value for memory");
+            }
+        }
+    }
+    @FXML
+    public static void updateUI() {
+
+        HashMap<String, Register> registers = currentProcessor.getDatapath().getRegisters();
+        for (HashMap.Entry<String, Register> entry : registers.entrySet()) {
+            TextField valueField = registerFields.get(entry.getKey());
+            if (valueField != null) {
+                valueField.setText("0x" + entry.getValue().getHexValue());
+            }
+        }
+
+        Map<String, Memory> memories = currentProcessor.getDatapath().getMemories();
+        for(Memory memory : memories.values()) {
+            for (int i = 0; i < memory.getSize(); i++) {
+                TextField valueField = memoryFields.get(i);
+                if (valueField != null) {
+                    valueField.setText("0x" + Integer.toHexString(memory.read(i)));
+                }
             }
         }
     }

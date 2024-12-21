@@ -9,10 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import javafx.util.Duration;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -33,9 +30,6 @@ import javafx.scene.layout.HBox;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Optional;
-
-import com.ipsim.processor.neander2.cpu.NeanderProcessor2;
-import com.ipsim.processor.neander3.cpu.NeanderProcessor3;
 
 import com.ipsim.exceptions.LexicalException;
 import com.ipsim.exceptions.SyntacticException;
@@ -71,8 +65,6 @@ public class EditorController {
         updateLineNumbers();
         scrollToEnd();
         cpusArray.add((Processor)new NeanderProcessor());
-        cpusArray.add((Processor) new NeanderProcessor2());
-        cpusArray.add((Processor) new NeanderProcessor3());
         generateAsmButtons();
     }
 
@@ -166,21 +158,19 @@ public class EditorController {
      */
     private void compile() {
         errorConsole.clear(); // Clear the error console
-        if (currentFile == null) {
-            if (!textEditor.getText().isEmpty()) {
-                FileChooser fileChooser = new FileChooser();
-                // Set the file extension filter to .asm files 
-                fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Assembly Files", "*.asm"));
-                File file = fileChooser.showSaveDialog(new Stage());
-                if (file != null) {
-                    try {
-                        // Write the content of the text editor to the file and compile it
-                        Files.write(file.toPath(), textEditor.getText().getBytes());
-                        currentFile = file;
-                        compileAndSaveBinary(currentFile);
-                    } catch (IOException | LexicalException | SyntacticException | SemanticException | CodeGenerationException e) {
-                        errorConsole.appendText("Compilation failed: " + e.getMessage() + "\n");
-                    }
+        if (currentFile == null && !textEditor.getText().isEmpty()) {
+            FileChooser fileChooser = new FileChooser();
+            // Set the file extension filter to .asm files 
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Assembly Files", "*.asm"));
+            File file = fileChooser.showSaveDialog(new Stage());
+            if (file != null) {
+                try {
+                    // Write the content of the text editor to the file and compile it
+                    Files.write(file.toPath(), textEditor.getText().getBytes());
+                    currentFile = file;
+                    compileAndSaveBinary(currentFile);
+                } catch (IOException | LexicalException | SyntacticException | SemanticException | CodeGenerationException e) {
+                    errorConsole.appendText("Compilation failed: " + e.getMessage() + "\n");
                 }
             } else {
                 errorConsole.appendText("No file is currently open and text editor is empty.\n");
@@ -250,7 +240,12 @@ public class EditorController {
             errorConsole.appendText("Failed to execute program: " + e.getMessage() + "\n");
         }
     }
+    @FXML
+    private void runStep() {
 
+        currentProcessor.executeStep();
+        SimulatorController.updateUI();
+    }
     @FXML
     /**
      * The openFile method opens a file

@@ -4,6 +4,6 @@ package com.ipsim.exceptions;
 */
 public class SyntacticException extends Exception {
     public SyntacticException(String message) {
-        super(message);
+        super("Syntactic Exception: " + message);
     }
 }

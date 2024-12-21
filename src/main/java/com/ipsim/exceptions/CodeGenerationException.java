@@ -5,6 +5,6 @@ package com.ipsim.exceptions;
 */
     public class CodeGenerationException extends Exception {
         public CodeGenerationException(String message) {
-            super(message);
+            super("Code Generation Exception: " + message);
         }
     }

@@ -78,30 +78,33 @@ public class NeanderProcessor extends Processor {
         datapath.init();
         // Execute the program
         while (!datapath.isProgramEnd()) {
-            int programCounter = datapath.getProgramCounter();
-            int instruction = datapath.getMemory().read(programCounter);
-            String binaryInstruction = String.format("%8s", Integer.toBinaryString(instruction)).replace(' ', '0');
-            String operation = controlpath.returnOperation(binaryInstruction.substring(0, 4));
-            List<Object> arguments = new ArrayList<>();
-    
-            // Check if the operation has arguments
-            if (operation.equals("STA") || operation.equals("LDA") || operation.equals("ADD") ||
-                operation.equals("OR") || operation.equals("AND") || operation.equals("JMP") ||
-                operation.equals("JN") || operation.equals("JZ")) {
-                // Extract the address from the instruction
-                int address = datapath.getMemory().read(programCounter + 1);
-                arguments.add(address);
-                // Increment the program counter
-                datapath.incrementProgramCounter();
-            }else {
-                arguments.add(0);
-            }
-            // Execute the operation
-            datapath.execute(operation, arguments);
-            // If the operation is not a jump instruction, increment the program counter
-            if(!operation.equals("JMP") && !operation.equals("JN") && !operation.equals("JZ")) {
-                datapath.incrementProgramCounter();
-            }
+            executeStep();
         }
     }    
+    public void executeStep() {
+        int programCounter = datapath.getProgramCounter();
+        int instruction = datapath.getMemory().read(programCounter);
+        String binaryInstruction = String.format("%8s", Integer.toBinaryString(instruction)).replace(' ', '0');
+        String operation = controlpath.returnOperation(binaryInstruction.substring(0, 4));
+        List<Object> arguments = new ArrayList<>();
+    
+        // Check if the operation has arguments
+        if (operation.equals("STA") || operation.equals("LDA") || operation.equals("ADD") ||
+            operation.equals("OR") || operation.equals("AND") || operation.equals("JMP") ||
+            operation.equals("JN") || operation.equals("JZ")) {
+            // Extract the address from the instruction
+            int address = datapath.getMemory().read(programCounter + 1);
+            arguments.add(address);
+            // Increment the program counter
+            datapath.incrementProgramCounter();
+        }else {
+            arguments.add(0);
+        }
+        // Execute the operation
+        datapath.execute(operation, arguments);
+        // If the operation is not a jump instruction, increment the program counter
+        if(!operation.equals("JMP") && !operation.equals("JN") && !operation.equals("JZ")) {
+            datapath.incrementProgramCounter();
+        }
+    }
 }

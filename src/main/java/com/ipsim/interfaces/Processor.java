@@ -15,6 +15,7 @@ public abstract class Processor {
     public abstract String compile(File file) throws IOException, LexicalException, SyntacticException, SemanticException, CodeGenerationException;
     public abstract DataPath getDatapath();
     public abstract void executeProgram();
+    public abstract void executeStep();
     public abstract String getName();
     public void setDatapath(DataPath datapath) {
         this.datapath = datapath;

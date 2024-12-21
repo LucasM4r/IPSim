@@ -4,6 +4,6 @@ package com.ipsim.exceptions;
 */
 public class SemanticException extends Exception {
     public SemanticException(String message) {
-        super(message);
+        super("Semantic Exception: " + message);
     }
 }
