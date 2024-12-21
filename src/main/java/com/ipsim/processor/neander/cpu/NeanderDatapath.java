@@ -11,12 +11,23 @@ public class NeanderDatapath extends DataPath {
     boolean programEnd = false;
     int programCounter = 0;
 
+    /**
+     * The constructor initializes the datapath
+     */
     public NeanderDatapath() {
         super();
         addMemory("dataProgram", new Memory(256, 8));
         addRegister("AC", new Register(8));
+        addRegister("Z", new Register(1));
+        addRegister("N", new Register(1));
     }
 
+    
+    /** 
+     * The execute method executes an operation in the datapath.
+     * @param operation
+     * @param arguments
+     */
     public void execute(String operation, List<Object> arguments) {
         if (!(arguments.get(0) instanceof Integer)) {
             throw new IllegalArgumentException(operation + " operation requires an integer argument");
@@ -31,23 +42,28 @@ public class NeanderDatapath extends DataPath {
                 break;
             case "LDA":
                 int ldaValue = loadMemory("dataProgram", (Integer) arguments.get(0));
-                storeRegister("AC", ldaValue & 0xFF); // Aplica a máscara de 8 bits
+                storeRegister("AC", ldaValue & 0xFF); // Apply the 8-bit mask
+                updateFlags();
                 break;
             case "ADD":
                 int addValue = loadRegister("AC") + loadMemory("dataProgram", (Integer) arguments.get(0));
-                storeRegister("AC", addValue & 0xFF); // Aplica a máscara de 8 bits
+                storeRegister("AC", addValue & 0xFF); // Apply the 8-bit mask
+                updateFlags();
                 break;
             case "OR":
                 int orValue = loadRegister("AC") | loadMemory("dataProgram", (Integer) arguments.get(0));
-                storeRegister("AC", orValue & 0xFF); // Aplica a máscara de 8 bits
+                storeRegister("AC", orValue & 0xFF);  // Apply the 8-bit mask
+                updateFlags();
                 break;
             case "AND":
                 int andValue = loadRegister("AC") & loadMemory("dataProgram", (Integer) arguments.get(0));
-                storeRegister("AC", andValue & 0xFF); // Aplica a máscara de 8 bits
+                storeRegister("AC", andValue & 0xFF); // Apply the 8-bit mask
+                updateFlags();
                 break;
             case "NOT":
-                int notValue = ~loadRegister("AC") & 0xFF; // Aplica a máscara de 8 bits
+                int notValue = ~loadRegister("AC") & 0xFF;  // Apply the 8-bit mask
                 storeRegister("AC", notValue);
+                updateFlags();
                 break;
             case "JMP":
                 programCounter = (Integer) arguments.get(0);
@@ -58,7 +74,7 @@ public class NeanderDatapath extends DataPath {
                 }
                 break;
             case "JZ":
-                if ((loadRegister("AC")) == 0) { // Aplica a máscara de 8 bits antes de comparar
+                if ((loadRegister("AC")) == 0) {
                     programCounter = (Integer) arguments.get(0);
                 }
                 break;
@@ -69,27 +85,46 @@ public class NeanderDatapath extends DataPath {
                 break;
         }
     }
-
+    /**
+     * The isProgramEnd method checks if the program has ended
+     * @return boolean
+     */
     public boolean isProgramEnd() {
         return programEnd;
     }
-
+    /**
+     * The method getProgramCounter() returns the program counter.
+     * @return boolean
+     */ 
     public int getProgramCounter() {
         return programCounter;
     }
-
+    /**
+     * The getMemory method returns the datapath data memory.
+     * @return Memory
+     */
     public Memory getMemory() {
         return memories.get("dataProgram");
     }
-
+    /**
+     * The incrementProgramCounter method increments the program counter.
+     */
     public void incrementProgramCounter() {
         programCounter++;
     }
-
+    /**
+     * The getRegisters() method returns the datapath registers.
+     * @return HashMap<String, Register>
+     */
     public HashMap<String, Register> getRegisters() {
         return registers;
     }
 
+    /**
+     * The loadProgram method loads a program into the datapath.
+     * @param binaryCode
+     * @throws IllegalArgumentException
+     */
     public void loadProgram(String binaryCode) {
         int address = 0;
         for (int i = 0; i < binaryCode.length(); i += 8) {
@@ -103,22 +138,34 @@ public class NeanderDatapath extends DataPath {
             }
         }
     }
-    
+    /**
+     * The init method initializes the datapath.
+     */
     public void init() {
         programEnd = false;
         programCounter = 0;
     }
+    /**
+     * The reset method resets the datapath.
+     */
     public void reset() {
         programEnd = false;
         programCounter = 0;
-        // Reseta os registradores
+        // Reset Registers
         for (Register register : registers.values()) {
             register.write(0);
         }
-        // Opcional: Limpa a memória se necessário
+        // Reset Memory
         for (int i = 0; i < memories.get("dataProgram").getSize(); i++) {
             memories.get("dataProgram").write(i, 0);
         }
     }
-    
+    /** 
+     * The updateFlags method updates the flags in the datapath.
+    */
+    public void updateFlags() {
+        int acValue = loadRegister("AC");
+        storeRegister("Z", (acValue == 0) ? 1 : 0);
+        storeRegister("N", (acValue < 0) ? 1 : 0);
+    }
 }

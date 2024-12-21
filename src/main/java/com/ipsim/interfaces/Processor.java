@@ -2,19 +2,25 @@ package com.ipsim.interfaces;
 import java.util.List;
 import java.io.File;
 import java.io.IOException;
-import com.ipsim.processor.neander.assembler.LexicalAnalyzer.LexicalException;
-import com.ipsim.processor.neander.assembler.SyntacticAnalyzer.SyntacticException;
-import com.ipsim.processor.neander.assembler.SemanticAnalyzer.SemanticException;
-import com.ipsim.processor.neander.assembler.CodeGenerator.CodeGenerationException;
+import com.ipsim.exceptions.CodeGenerationException;
+import com.ipsim.exceptions.LexicalException;
+import com.ipsim.exceptions.SemanticException;
+import com.ipsim.exceptions.SyntacticException;
 
 public abstract class Processor {
     
-    DataPath datapath = null;
-    ControlPath controlpath = null;
-    public abstract void getOperation();
+    private DataPath datapath = null;
+    private ControlPath controlpath = null;
     public abstract List<String> binaryParser(String binaryInstruction);
-    public abstract String getName();
     public abstract String compile(File file) throws IOException, LexicalException, SyntacticException, SemanticException, CodeGenerationException;
     public abstract DataPath getDatapath();
     public abstract void executeProgram();
+    public abstract void executeStep();
+    public abstract String getName();
+    public void setDatapath(DataPath datapath) {
+        this.datapath = datapath;
+    }
+    public void setControlpath(ControlPath controlpath) {
+        this.controlpath = controlpath;
+    }
 }

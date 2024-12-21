@@ -19,6 +19,11 @@ public class Memory {
         }
     }
 
+    
+    /** 
+     * @param address
+     * @param value
+     */
     public void write(int address, int value) {
         if (address < 0 || address >= size) {
             throw new IllegalArgumentException("Endereço fora do intervalo da memória.");

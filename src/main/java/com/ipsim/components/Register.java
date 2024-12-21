@@ -9,6 +9,10 @@ public class Register {
         this.value = 0;
     }
 
+    
+    /** 
+     * @param value
+     */
     public void write(int value) {
 
         checkValue(value);

@@ -7,4 +7,6 @@ module com.ipsim {
     requires java.compiler;
     opens com.ipsim to javafx.fxml;
     exports com.ipsim;
+    exports com.ipsim.interfaces;
+    exports com.ipsim.components;
 }

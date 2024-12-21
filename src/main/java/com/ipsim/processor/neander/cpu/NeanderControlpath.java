@@ -7,6 +7,13 @@ public class NeanderControlpath implements ControlPath {
     public NeanderControlpath() {
     }
 
+    
+    /** 
+     * O método returnOperation() recebe uma instrução de 4 bits 
+     * e retorna a operação correspondente.
+     * @param instruction
+     * @return String
+     */
     public String returnOperation(String instruction) {
         switch (instruction) {
             case "0001":

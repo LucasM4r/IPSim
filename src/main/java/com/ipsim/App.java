@@ -1,3 +1,8 @@
+/**
+ * App class to build the application
+ * @author Lucas Marchesan da Silva
+ * @version 1.0
+ */
 package com.ipsim;
 
 import javafx.application.Application;
@@ -7,6 +12,12 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class App extends Application {
+    
+    /** 
+     * The method start initializes the application
+     * @param primaryStage
+     * @throws Exception
+     */
     @Override
     public void start(Stage primaryStage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/ipsim/ide.fxml"));

@@ -50,6 +50,7 @@
     <HBox styleClass="button-bar">
       <Button text="Show"    onAction="#show"/>
       <Button text="Compile" onAction="#compile"/>
+      <Button text="Step" onAction="#runStep"/>
       <Button text="Run" onAction="#run"/>
     </HBox>
     <!-- Área de edição -->
