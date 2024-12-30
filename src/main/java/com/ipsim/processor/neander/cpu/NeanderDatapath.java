@@ -1,11 +1,11 @@
 package com.ipsim.processor.neander.cpu;
 
-import com.ipsim.interfaces.DataPath;
-import com.ipsim.components.Memory;
-import com.ipsim.components.Register;
-
 import java.util.HashMap;
 import java.util.List;
+
+import com.ipsim.components.Memory;
+import com.ipsim.components.Register;
+import com.ipsim.interfaces.DataPath;
 public class NeanderDatapath extends DataPath {
 
     boolean programEnd = false;
@@ -28,6 +28,7 @@ public class NeanderDatapath extends DataPath {
      * @param operation
      * @param arguments
      */
+    @Override
     public void execute(String operation, List<Object> arguments) {
         if (!(arguments.get(0) instanceof Integer)) {
             throw new IllegalArgumentException(operation + " operation requires an integer argument");
@@ -166,6 +167,8 @@ public class NeanderDatapath extends DataPath {
     public void updateFlags() {
         int acValue = loadRegister("AC");
         storeRegister("Z", (acValue == 0) ? 1 : 0);
-        storeRegister("N", (acValue < 0) ? 1 : 0);
+
+        int bitMask = 1 << (registers.get("AC").getNumBits() - 1);
+        storeRegister("N", (acValue & bitMask) != 0 ? 1 : 0);
     }
 }

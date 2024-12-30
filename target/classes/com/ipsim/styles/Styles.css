@@ -33,7 +33,7 @@
     -fx-background-color: #1a1a1a;
     -fx-alignment: center-right;
 }
-.button-bar .button {
+.button-bar .button, .simulator-button-bar .button {
     -fx-background-color: #1a1a1a; /* Cor de fundo preta */
     -fx-text-fill: #ffffff; /* Cor do texto branca */
     -fx-border-color: transparent #ffffff #ffffff #ffffff; /* Borda apenas nos lados esquerdo e direito */
@@ -41,7 +41,7 @@
     -fx-border-radius: 0; /* Remove bordas arredondadas */
     -fx-background-radius: 0; /* Remove bordas arredondadas */
 }
-.button-bar .button:hover {
+.button-bar .button:hover, .simulator-button-bar .button:hover {
     -fx-background-color: #2b2b2b; /* Cor de fundo escura */
     -fx-cursor: hand;
 }
@@ -113,7 +113,7 @@
     -fx-background-color: #2b2b2b; /* Cor de fundo escura */
     -fx-cursor: hand;
 }
-#toggleButtonContainer .toggle-button:selected {
+#toggleButtonContainer .toggle-button:selected, .simulator-button-bar .button:selected {
     -fx-background-color: #2b2b2b; /* Cor de fundo escura */
 }
 
@@ -126,6 +126,9 @@
     -fx-background-color: #444444; /* Cor da divisão */
     -fx-border-color: #666666; /* Borda da divisão */
     -fx-border-width: 1px;
+}
+#simulatorContainer {
+    -fx-pref-width: 500px
 }
 
 .simulator_container {
@@ -170,15 +173,17 @@
     -fx-background-color: #2b2b2b;
     -fx-alignment: top-center;
 }
-
-.register-label, .value-field, .value-label, .memories-label, .memory-label, .memory-button, .address-label {
+#simulatorContainer {
+    -fx-pref-width: 5000px;
+}
+.register-label, .value-field, .value-label, .memories-label, .memory-label, .memory-button, .address-label, .memory-name-header {
     -fx-text-fill: white;
     -fx-border-color: white;
     -fx-border-width: 1px;
     -fx-padding: 5px;
     -fx-alignment: center;
-    -fx-pref-width: 300px; /* Ajuste conforme necessário */
-    -fx-pref-height: 30px; /* Ajuste conforme necessário */
+    -fx-pref-width: 5000px;
+    -fx-pref-height: 30px; 
 }
 .value-field {
     -fx-background-color: #2b2b2b;
@@ -208,3 +213,4 @@
     -fx-fit-to-height: true;
     -fx-alignment: top-center;
 }
+

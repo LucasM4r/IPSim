@@ -9,34 +9,37 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import com.ipsim.components.Memory;
+import com.ipsim.components.Register;
+import com.ipsim.exceptions.CodeGenerationException;
+import com.ipsim.exceptions.LexicalException;
+import com.ipsim.exceptions.SemanticException;
+import com.ipsim.exceptions.SyntacticException;
+import com.ipsim.interfaces.Processor;
+import com.ipsim.processor.neander.cpu.NeanderProcessor;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.ToggleGroup;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.scene.layout.HBox;
-
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Optional;
-
-import com.ipsim.exceptions.LexicalException;
-import com.ipsim.exceptions.SyntacticException;
-import com.ipsim.exceptions.SemanticException;
-import com.ipsim.exceptions.CodeGenerationException;
-import com.ipsim.interfaces.Processor;
-import com.ipsim.processor.neander.cpu.NeanderProcessor;
 public class EditorController {   
     
     private File currentFile;
@@ -51,12 +54,23 @@ public class EditorController {
     private ToggleGroup toggleGroup = new ToggleGroup(); // Button group for processor selection
     @FXML
     private HBox toggleButtonContainer;
+    @FXML
+    private ToggleGroup simulatorToggleGroup = new ToggleGroup(); // Button group for memory selection
     @FXML 
     private TextArea errorConsole;
 
+    @FXML
+    private HBox simulatorButtonContainer;
+
+    @FXML
+    private GridPane registerContainer;
+    @FXML
+    private HBox memoriesContainer;
     private List<Processor> cpusArray = new ArrayList<>();
     private Processor currentProcessor;
 
+    private Map<String, TextField> registerFields = new HashMap<>();
+    private static List<TextField> memoryFields = new ArrayList<>();
     public void initialize() {
         textEditor.textProperty().addListener((observable, oldValue, newValue) -> {
             updateLineNumbers();
@@ -66,6 +80,8 @@ public class EditorController {
         scrollToEnd();
         cpusArray.add((Processor)new NeanderProcessor());
         generateAsmButtons();
+        showRegisters();
+        showMemory();
     }
 
 
@@ -211,21 +227,6 @@ public class EditorController {
 
     @FXML
     /**
-     * The show method shows the second stage
-     */
-    private void show() {
-        // Lógica para executar o código
-        System.out.println("Executando o código...");
-        try {
-            createSecondStage();
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-            errorConsole.appendText("Failed to create second stage: " + e.getMessage() + "\n");
-        }
-    }
-    @FXML
-    /**
      * The run method runs the code in the text editor
      */
     private void run() {
@@ -235,6 +236,7 @@ public class EditorController {
             }
             currentProcessor.compile(currentFile);
             currentProcessor.executeProgram();
+            updateUI();
         } catch (Exception e) {
             e.printStackTrace();
             errorConsole.appendText("Failed to execute program: " + e.getMessage() + "\n");
@@ -244,7 +246,7 @@ public class EditorController {
     private void runStep() {
 
         currentProcessor.executeStep();
-        SimulatorController.updateUI();
+        updateUI();
     }
     @FXML
     /**
@@ -334,23 +336,131 @@ public class EditorController {
         }
         return false;
     }
-    /**
-     * The createSecondStage method creates the second stage
-     * @throws Exception
-     */
-    private void createSecondStage() throws Exception {
-        Stage secondStage = new Stage();
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/ipsim/simulator.fxml"));
-        secondStage.setTitle("Simulator");
-        HBox root = loader.load();
-        Scene scene = new Scene(root);
-        scene.getStylesheets().add(getClass().getResource("/com/ipsim/styles/Styles.css").toExternalForm());
-        secondStage.setScene(scene);
-        secondStage.setMinWidth(500);
-        secondStage.setMinHeight(300);
-        secondStage.show();
+
+    private void generateSimulatorMemoryButtons() {
+        
+        Map<String, Memory> memories = currentProcessor.getDatapath().getMemories();
+        for(Map.Entry<String, Memory> memory : memories.entrySet()) {
+            System.out.println("Criando botão para memória: " + memory.getKey());
+            ToggleButton button = new ToggleButton(memory.getKey());
+            button.setToggleGroup(simulatorToggleGroup);
+            button.getStyleClass().add("button");
+            button.setOnAction(e -> {
+                showMemory();
+            });
+            simulatorButtonContainer.getChildren().add(button);
+            
+        }
+    }
+    @FXML
+    private void showRegisters() {
+        registerFields.clear();
+        Map<String, Register> registers = currentProcessor.getDatapath().getRegisters();
+        int row = 0;
+        registerContainer.getChildren().clear();
+
+
+        for(Map.Entry<String, Register> register : registers.entrySet()) {
+            if(registerContainer != null) {
+                Label registerLabel = new Label(register.getKey());
+                registerLabel.getStyleClass().add("register-label");
+                registerContainer.add(registerLabel, 0, row);
+
+                TextField valueField = new TextField("0x" + register.getValue().getHexValue());
+                valueField.getStyleClass().add("value-field");
+                registerContainer.add(valueField, 1, row);
+
+                registerFields.put(register.getKey(), valueField);
+                row++;
+            }
+        }
+    }
+    private void saveRegisters() {
+        if (registerFields == null || registerFields.isEmpty()) {
+            throw new NullPointerException("Register fields not found");
+        }
+
+        // Get the registers from the processor
+        Map<String, Register> registers = currentProcessor.getDatapath().getRegisters();
+
+        // Iterate over the register fields and update the register values
+        for (Map.Entry<String, TextField> entry : registerFields.entrySet()) {
+            String registerName = entry.getKey();
+            TextField valueField = entry.getValue();
+            String value = valueField.getText();
+            try {
+                int registerValue;
+                if (value.startsWith("0x")) {
+                    // Hexadecimal value
+                    value = value.substring(2);
+                    registerValue = Integer.parseInt(value, 16);
+                } else {
+                    // Decimal value
+                    registerValue = Integer.parseInt(value);
+                }
+                registers.get(registerName).write(registerValue);
+            } catch (NumberFormatException e) {
+                throw new NumberFormatException("Invalid value for register: " + registerName);
+            }
+        }
+    }
+    @FXML
+    public void showMemory() {
+        memoryFields.clear();
+        Map<String, Memory> memories = currentProcessor.getDatapath().getMemories();
+        int i = 0;
+        for(Map.Entry<String, Memory> entry : memories.entrySet()) {
+
+            GridPane gridPane = new GridPane();
+            gridPane.getStyleClass().add("memory-grid" + i);
+            memoriesContainer.getChildren().add(gridPane);
+
+            Label memoryNameHeader = new Label(entry.getKey());
+            memoryNameHeader.getStyleClass().add("memory-name-header");
+            gridPane.add(memoryNameHeader, 0, 0, 2, 1); // Span across two columns
+            Label memoryHeader = new Label("Address");
+            memoryHeader.getStyleClass().add("address-label");
+            gridPane.add(memoryHeader, 0, 1);
+            Label valueHeader = new Label("Value");
+            valueHeader.getStyleClass().add("value-label");
+            gridPane.add(valueHeader, 1, 1);
+            Memory memory = entry.getValue();
+            i++;
+            for(int j=2; j<memory.getSize(); j++) {
+                Label addressLabel = new Label("0x" + Integer.toHexString(j));
+                addressLabel.getStyleClass().add("address-label");
+                gridPane.add(addressLabel, 0, j);
+
+                TextField valueField = new TextField("0x" + Integer.toHexString(memory.read(j)));
+                valueField.getStyleClass().add("value-field");
+                gridPane.add(valueField, 1, j);
+                memoryFields.add(valueField);
+            }
+            ScrollPane memoryScrollPane = new ScrollPane(gridPane);
+            memoryScrollPane.setFitToWidth(true);
+            memoryScrollPane.setFitToHeight(true);
+            memoriesContainer.getChildren().add(memoryScrollPane);
+        }
+    }
+    public void updateUI() {
+        Map<String, Register> registers = currentProcessor.getDatapath().getRegisters();
+        for (Map.Entry<String, Register> entry : registers.entrySet()) {
+            TextField valueField = registerFields.get(entry.getKey());
+            if (valueField != null) {
+                valueField.setText("0x" + entry.getValue().getHexValue());
+            }
+        }
     
-        SimulatorController.setStage(secondStage);
-        SimulatorController.setCurrentProcessor(currentProcessor);
+        Map<String, Memory> memories = currentProcessor.getDatapath().getMemories();
+        for (Memory memory : memories.values()) {
+            for (int i = 0; i < memory.getSize(); i++) {
+                if (i < memoryFields.size()) {
+                    TextField valueField = memoryFields.get(i);
+                    if (valueField != null) {
+                        valueField.setText("0x" + Integer.toHexString(memory.read(i)));
+                    }
+                }
+            }
+        }
     }
 }

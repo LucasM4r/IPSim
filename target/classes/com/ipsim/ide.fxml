@@ -13,6 +13,7 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.GridPane?>
 <VBox xmlns:fx="http://javafx.com/fxml"
   fx:controller="com.ipsim.EditorController">
   <MenuBar styleClass="menu-bar">
@@ -48,36 +49,56 @@
   <VBox styleClass="container">
     <!-- Área de botões -->
     <HBox styleClass="button-bar">
-      <Button text="Show"    onAction="#show"/>
       <Button text="Compile" onAction="#compile"/>
       <Button text="Step" onAction="#runStep"/>
       <Button text="Run" onAction="#run"/>
     </HBox>
     <!-- Área de edição -->
+
     <HBox fx:id="toggleButtonContainer"></HBox>
-    <SplitPane orientation="VERTICAL" dividerPositions="0.7">
-      <ScrollPane fx:id="scrollPane" fitToWidth="true" fitToHeight="true">
-        <HBox>
-            <!-- Área para os números das linhas -->
-            <VBox fx:id="lineNumberFlow" 
-                  prefWidth="50"
-                  styleClass="line-number-flow"/>
-            
-            <!-- TextArea principal para edição -->
-            <TextArea fx:id="textEditor" 
-                      prefHeight="600"
-                      wrapText="true"
-                      styleClass="text-editor"
-                      HBox.hgrow="ALWAYS"/>          
-        </HBox>
-      </ScrollPane>
-      <!-- TextArea para exibir erros -->
-      <TextArea fx:id="errorConsole"
-                prefHeight="200"
-                wrapText="true"
-                editable="false"
-                styleClass="error-console"
-                VBox.vgrow="NEVER"/>
-    </SplitPane>
+    <HBox fx:id="containerIdeSim">
+      <SplitPane orientation="HORIZONTAL" dividerPositions="0.7">
+        <items>
+            <SplitPane orientation="VERTICAL" dividerPositions="0.4">
+                <ScrollPane fx:id="scrollPane" fitToWidth="true" fitToHeight="true">
+                    <HBox>
+                        <!-- Área para os números das linhas -->
+                        <VBox fx:id="lineNumberFlow" 
+                              prefWidth="50"
+                              styleClass="line-number-flow"/>
+                        
+                        <!-- TextArea principal para edição -->
+                        <TextArea fx:id="textEditor" 
+                                  prefHeight="1000"
+                                  wrapText="true"
+                                  styleClass="text-editor"
+                                  HBox.hgrow="ALWAYS"/>          
+                    </HBox>
+                </ScrollPane>
+                <!-- TextArea para exibir erros -->
+                <TextArea fx:id="errorConsole"
+                          prefHeight="200"
+                          wrapText="true"
+                          editable="false"
+                          styleClass="error-console"
+                          VBox.vgrow="ALWAYS"/>
+            </SplitPane>
+            <VBox SplitPane.resizableWithParent="true" 
+            fx:id="simulatorContainer">
+              <SplitPane orientation="VERTICAL" dividerPositions="0.7">
+                <ScrollPane fitToWidth="true" fitToHeight="true">
+                  <GridPane fx:id="registerContainer">
+                      <!-- Os registradores serão adicionados aqui -->
+                  </GridPane>
+                </ScrollPane>
+                <!-- Fechar o SplitPane corretamente -->
+                <HBox fx:id="memoriesContainer">
+                    
+                </HBox>
+              </SplitPane>
+            </VBox>
+        </items>
+      </SplitPane>
+    </HBox>
   </VBox>
 </VBox>

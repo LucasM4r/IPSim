@@ -35,4 +35,7 @@ public class Register {
     public String getHexValue() {
         return Integer.toHexString(value);
     }
+    public int getNumBits() {
+        return numBits;
+    }
 }
