@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import com.ipsim.exceptions.SyntacticException;
+
 public class NeanderSyntacticAnalyzer {
     public HashMap<String, Integer> symbolTable = new HashMap<String, Integer>();
     

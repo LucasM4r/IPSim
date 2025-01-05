@@ -1,0 +1,4 @@
+LDA a
+HLT
+
+a: db 2

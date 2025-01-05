@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ipsim.exceptions.LexicalException;
-public class NeanderLexicalAnalyzer {
+import com.ipsim.interfaces.LexicalAnalyzer;
+public class NeanderLexicalAnalyzer implements LexicalAnalyzer {
     private static final String[] PSEUDO_INSTRUCTIONS = {
         "org", "db"
     };
